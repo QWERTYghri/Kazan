@@ -1,6 +1,5 @@
-# Other 
-layout
-kazan
+./layout
+./kazan
 
 # Prerequisites
 *.d
