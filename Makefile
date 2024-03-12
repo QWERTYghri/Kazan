@@ -13,7 +13,7 @@ all: $(NAME)
 
 # Compile executable
 kazan: ./src/*.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(OFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB) $(OFLAGS) -o $@ $^
 	
 # Install executable
 install: ./$(NAME)
@@ -25,4 +25,4 @@ uninstall:
 	
 # Clean File Mess
 clean:
-	-rm -f *.out *.o $(NAME)
+	-rm -f *.out *.o ./$(NAME)

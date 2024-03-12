@@ -16,6 +16,7 @@ OFLAGS	 := -g -O0
 #OFLAGS	 := -Os
 
 # Library
+LIB	 := -lX11
 
 # Destination
 BINPATH  := /usr/local/bin
