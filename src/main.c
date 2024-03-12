@@ -7,13 +7,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <signal.h>
 
 /* POSIX */
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <getopt.h>
+#include <syslog.h>
 
 /* Local */
 #include "./define.h"
+
+/* Initialize Program as Daemon */
+static void
+createDaemon ( void )
+{
+	/* Define pid and then fork from parent process */
+	pid_t pid = fork ();
+	
+	/* Exit with EXIT_FAILURE if PID returns less than 0 */
+	if ( pid < 0 )
+		exit ( EXIT_FAILURE );
+	
+	/* Exit with EXIT_SUCCESS if PID returns greater than 0 */
+	if ( pid > 0 )
+		exit ( EXIT_SUCCESS );
+		
+	/* Create new session and exit if fails */
+	if ( setsid () < 0 )
+		exit ( EXIT_FAILURE );
+		
+	/* Signal Handle */
+	signal ( SIGCHLD, SIG_IGN );
+	signal ( SIGHUP, SIG_IGN );
+	
+	pid = fork ();
+	
+	/* Exit with EXIT_FAILURE if PID returns less than 0 */
+	if ( pid < 0 )
+		exit ( EXIT_FAILURE );
+	
+	/* Exit with EXIT_SUCCESS if PID returns greater than 0 */
+	if ( pid > 0 )
+		exit ( EXIT_SUCCESS );
+	
+	/* Set file node mask and changing working directory to root */
+	umask ( 0 );
+	chdir ( "/" );
+    
+    	for ( int32_t i = sysconf ( _SC_OPEN_MAX ); i >= 0; i-- )
+    		close ( i );
+}
+
+/* Clean Kazan Function */
+static void
+cleanKazan ( void )
+{
+	
+}
+
+/* Wallpaper function, creates daemon and plays video on loop */
+static void
+wallpaper ( char* fileName )
+{
+	createDaemon ();
+	
+	while ( 1 )
+	{
+		syslog ( LOG_NOTICE, "Test" );
+		sleep ( 20 );
+	}
+}
+
+/* Play all videos in a directory */
+static void
+folder ( char* fileName )
+{
+	
+}
 
 /* Parse Options Functions */
 static int32_t
@@ -24,6 +96,7 @@ parseOptions ( int32_t argc, char** argv )
 	{
 		{ "clean",	no_argument,	   NULL, 'c' },
 		{ "add",	required_argument, NULL, 'a' },
+		{ "folder",	required_argument, NULL, 'f' },
 		{ NULL,		0,		   NULL, 0 }
 	};
 	
@@ -35,11 +108,21 @@ parseOptions ( int32_t argc, char** argv )
 		switch ( character )
 		{
 			case 'c':
-				return 1;
+				/* Clean all instances of kazan */
+				cleanKazan ();
+				break;
 			case 'a':
-				return 2;
+				/* Start playing a file on loop */
+				wallpaper ( optarg );
+				break;
+			case 'f':
+				/* Loop through entire directory and fade transition between each wallpaper */
+				folder ( optarg );
+				break;
 			default:
 				fprintf ( stderr, GET_OPT_ERROR, character );
+				
+				/* Return failure */
 				return -1;
 		}
 	}
@@ -53,17 +136,21 @@ parseOptions ( int32_t argc, char** argv )
 		/* List invalid commands written */
 		while ( optind < argc )
 			fprintf ( stderr, INVALID_COMMAND, argv[optind++] );
+		
+		/* Return failure */
+		return -1;
 	}
 	
-	return -1;
+	/* Return success */
+	return 0;
 }
 
 /* Start Point */
 int
 main ( int argc, char** argv )
 {
-	int32_t result = parseOptions ( argc, argv );
-	printf ( "%d\n", result );
-
+	if ( parseOptions ( argc, argv ) )
+		exit ( EXIT_FAILURE );
+	
 	return 0;
 }
