@@ -6,6 +6,7 @@
 
 /* Name */
 #define KAZAN_NAME ( "kazan" )
+#define PROC ( "/proc" )
 
 /* Errors */
 #define ERROR_NO_OPTIONS ( "Error : Non-Option Arguments\n\n" )

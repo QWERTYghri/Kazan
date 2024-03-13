@@ -1,6 +1,7 @@
 /*
  * Main Program File for Kazan
  *
+ * I feel like this is more complicated than it needs to be
  */
  
 /* LIB C */
@@ -8,13 +9,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <signal.h>
+#include <fts.h>
 
 /* POSIX */
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <getopt.h>
-#include <syslog.h>
+#include <regex.h>
 
 /* Local */
 #include "./define.h"
@@ -64,18 +66,18 @@ createDaemon ( void )
 static void
 cleanKazan ( void )
 {
-	
+	/* Find PID */
+	FTS* processes = fts_open ( PROC, 
 }
 
 /* Wallpaper function, creates daemon and plays video on loop */
 static void
-wallpaper ( char* fileName )
+wallpaper ( char* fileName, int32_t loop )
 {
 	createDaemon ();
 	
-	while ( 1 )
+	while ( loop )
 	{
-		syslog ( LOG_NOTICE, "Test" );
 		sleep ( 20 );
 	}
 }
